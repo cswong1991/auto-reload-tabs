@@ -8,12 +8,12 @@ class PopupController {
         document.getElementById("rs_form").addEventListener("submit", this.start.bind(this));
         document.getElementById("stop").addEventListener("click", this.stop.bind(this));
         document.getElementById("load_default").addEventListener("click", this.loadDefault.bind(this));
+
+        // init SettingsController
+        this.settings_controller = new SettingsController();
     }
 
     async init() {
-        // init SettingsController
-        this.settings_controller = new SettingsController();
-
         // get current tab url & domain
         let current_tab = await chrome.tabs.query({ currentWindow: true, active: true });
         let required_url = new URL(current_tab[0]['url']);

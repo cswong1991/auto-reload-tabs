@@ -3,12 +3,9 @@ class OptionsController {
         $(window).on('hashchange ', this.renderContent.bind(this));
         $("#extension_toggle").on("click", this.extensionToggle.bind(this));
         $("#extension_reset").on("click", this.extensionReset.bind(this));
-    }
 
-    init() {
         this.settings_controller = new SettingsController();
         this.table_controller = new TablesController();
-        this.renderContent();
     }
 
     renderContent(event) {
@@ -104,4 +101,4 @@ class OptionsController {
 }
 
 let Controller = new OptionsController();
-Controller.init();
+Controller.renderContent();
