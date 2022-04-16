@@ -41,13 +41,21 @@ class SettingsController {
         await chrome.storage.local.set(new_data);
     }
 
-    async saveSettings(new_data) {
+    async saveSettings(new_data, target_url) {
         await chrome.storage.local.set(new_data);
-        this.activateSettings();
+        this.activateSettings(target_url);
     }
 
-    async activateSettings() {
+    async activateSettings(target_url) {
         let tabs = await chrome.tabs.query({ url: ['http://*/*', 'https://*/*'] });
-        tabs.forEach(el => chrome.tabs.sendMessage(el['id'], {}));
+        if (target_url) {
+            if (typeof target_url === 'string') {
+                tabs.filter(e1 => e1['url'].includes(target_url)).forEach(e1 => chrome.tabs.sendMessage(e1['id'], {}));
+            } else {
+                tabs.filter(e1 => target_url.some(e2 => e1['url'].includes(e2))).forEach(el => chrome.tabs.sendMessage(el['id'], {}));
+            }
+        } else {
+            tabs.forEach(el => chrome.tabs.sendMessage(el['id'], {}));
+        }
     }
 }

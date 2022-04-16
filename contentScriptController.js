@@ -28,9 +28,11 @@ class ContentScriptController {
             if (use_settings['scrollrestoration']['enable']) {
                 let x_pos = sessionStorage.getItem('x_pos');
                 let y_pos = sessionStorage.getItem('y_pos');
-                setTimeout(() => {
-                    window.scrollTo(x_pos ?? 0, y_pos ?? 0);
-                }, use_settings['scrollrestoration']['restore_delay'] * 1000);
+                if (x_pos !== null && y_pos !== null) {
+                    setTimeout(() => {
+                        window.scrollTo(x_pos, y_pos);
+                    }, use_settings['scrollrestoration']['restore_delay'] * 1000);
+                }
             }
             // start timer
             this.startTimer(use_settings);

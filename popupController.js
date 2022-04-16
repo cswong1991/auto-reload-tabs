@@ -129,7 +129,7 @@ class PopupController {
                 new_data[this.domain] = validate_result.new_settings;
             }
             this.settings_controller
-                .saveSettings(new_data)
+                .saveSettings(new_data, document.getElementById("this_url").checked ? this.url : this.domain)
                 .then(() => location.reload());
         } else {
             document.getElementById('error').innerHTML = validate_result.error;
@@ -200,7 +200,7 @@ class PopupController {
             new_data[this.domain] = { ...this.active_settings['domain_settings'], enable: false };
         }
         this.settings_controller
-            .saveSettings(new_data)
+            .saveSettings(new_data, document.getElementById("this_url").checked ? this.url : this.domain)
             .then(() => location.reload());
     }
 

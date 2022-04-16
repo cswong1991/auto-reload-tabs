@@ -45,10 +45,13 @@ class OptionsController {
             .then(() => location.reload());
     }
 
-    extensionReset() {
+    async extensionReset() {
         let agree = confirm('All settings will be reset to default value. Are you sure to continue?');
         if (agree) {
-            chrome.storage.local.clear(() => location.reload());
+            await chrome.storage.local.clear();
+            this.settings_controller
+                .activateSettings()
+                .then(() => location.reload());
         }
     }
 
@@ -72,7 +75,7 @@ class OptionsController {
         $('.select-element').on('change', this.selectTBLElement.bind(this));
         $('#select-all').on('change', this.selectTBLAll.bind(this));
         $('.delete-btn').on('click', this.deleteTBLElement.bind(this));
-        $('#delete-multi').on('click', this.deleteTBLAll.bind(this));
+        $('#delete-multi').on('click', this.deleteMultiTBLElements.bind(this));
     }
 
     selectTBLElement(event) {
@@ -90,13 +93,15 @@ class OptionsController {
     }
 
     async deleteTBLElement(event) {
-        await chrome.storage.local.remove(event.target.dataset.key);
-        this.settings_controller.activateSettings().then(() => location.reload());
+        let target_url = event.target.dataset.key;
+        await chrome.storage.local.remove(target_url);
+        this.settings_controller.activateSettings(target_url).then(() => location.reload());
     }
 
-    async deleteTBLAll() {
-        await chrome.storage.local.remove(this.table_controller.data);
-        this.settings_controller.activateSettings().then(() => location.reload());
+    async deleteMultiTBLElements() {
+        let target_urls = this.table_controller.selected_elements;
+        await chrome.storage.local.remove(target_urls);
+        this.settings_controller.activateSettings(target_urls).then(() => location.reload());
     }
 }
 
