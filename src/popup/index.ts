@@ -1,5 +1,5 @@
 import "bootstrap/dist/css/bootstrap.min.css";
-import { BehaviorSubject, concat, concatMap, forkJoin, from, fromEvent, map, mergeMap, of, pipe, tap, type Observable, type UnaryFunction } from "rxjs";
+import { BehaviorSubject, concatMap, defer, forkJoin, from, fromEvent, iif, map, mergeMap, of, pipe, tap, throwError, type Observable, type UnaryFunction } from "rxjs";
 import { AutoReloadTab, Extension } from "../common";
 
 const toggle_extension = document.getElementById('toggle_extension') as HTMLButtonElement;
@@ -29,42 +29,49 @@ renderEvent
             const use_default = array[0];
             const tab_url = array[1];
 
-            return forkJoin([
-                extension.enabled,
-                AutoReloadTab.get(
-                    tab_url,
-                    use_default
-                )
-            ]);
+            return iif(
+                () => ['http:', "https:"].includes(array[1].protocol),
+                defer(() => forkJoin([
+                    extension.enabled,
+                    AutoReloadTab.get(
+                        tab_url,
+                        use_default
+                    )
+                ])),
+                throwError(() => new Error())
+            );
         })
     )
-    .subscribe((array) => {
-        const extension_enabled = array[0];
-        const tab_config = array[1];
+    .subscribe({
+        next: (array) => {
+            const extension_enabled = array[0];
+            const tab_config = array[1];
 
-        toggle_extension.classList.toggle(
-            'bg-success',
-            extension_enabled
-        );
-        toggle_extension.classList.toggle(
-            'bg-danger',
-            !extension_enabled
-        );
+            toggle_extension.classList.toggle(
+                'bg-success',
+                extension_enabled
+            );
+            toggle_extension.classList.toggle(
+                'bg-danger',
+                !extension_enabled
+            );
 
-        const enabled_on_this_tab = (extension_enabled && tab_config.enabled);
-        info.classList.toggle(
-            'text-success',
-            enabled_on_this_tab
-        );
-        info.classList.toggle(
-            'text-danger',
-            !enabled_on_this_tab
-        );
-        info.innerText = (enabled_on_this_tab) ? 'Auto reload is running on this tab' : 'Auto reload is not running on this tab';
+            const enabled_on_this_tab = (extension_enabled && tab_config.enabled);
+            info.classList.toggle(
+                'text-success',
+                enabled_on_this_tab
+            );
+            info.classList.toggle(
+                'text-danger',
+                !enabled_on_this_tab
+            );
+            info.innerText = (enabled_on_this_tab) ? 'Auto reload is running on this tab' : 'Auto reload is not running on this tab';
 
-        r_type[tab_config.rType].checked = true;
-        r_interval.valueAsNumber = tab_config.rInterval;
-        bypass_cache.checked = tab_config.bypassCache;
+            r_type[tab_config.rType].checked = true;
+            r_interval.valueAsNumber = tab_config.rInterval;
+            bypass_cache.checked = tab_config.bypassCache;
+        },
+        error: () => { window.close(); }
     });
 
 function renderContentSrc(url: string | string[]): Observable<void> {
@@ -89,11 +96,11 @@ function toggleTabConfig(enabled: boolean): UnaryFunction<Observable<unknown>, O
             model.rInterval = r_interval.valueAsNumber;
             model.bypassCache = bypass_cache.checked;
 
-            return concat(
+            return forkJoin([
                 model.save(),
                 // url with # cannot be queried, use host instead
                 renderContentSrc((model.rType === 1 || model.url.href.includes("#")) ? `*://${model.url.host}/*` : model.url.href)
-            );
+            ]);
         })
     );
 }
@@ -102,10 +109,10 @@ fromEvent(
     toggle_extension,
     'click'
 ).pipe(
-    concatMap(() => concat(
+    concatMap(() => forkJoin([
         extension.toggle(),
         renderContentSrc("*://*/*")
-    )),
+    ])),
     tap(() => { renderEvent.next(false); })
 ).subscribe();
 
@@ -113,10 +120,10 @@ fromEvent(
     reset_extension,
     'click'
 ).pipe(
-    concatMap(() => concat(
+    concatMap(() => forkJoin([
         extension.reset(),
         renderContentSrc("*://*/*")
-    )),
+    ])),
     tap(() => { renderEvent.next(false); })
 ).subscribe();
 
