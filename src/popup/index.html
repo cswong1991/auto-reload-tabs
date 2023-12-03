@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title>popup</title>
+    <meta charset="UTF-8">
+</head>
+
+<body style="width: 600px">
+    <div class="m-2">
+        <div class="d-flex justify-content-between">
+            <button class="btn btn-secondary me-1 w-100" id="toggle_extension">
+                Enable/Disable
+            </button>
+            <button class="btn btn-secondary ms-1 w-100" id="reset_extension">
+                Reset Extension
+            </button>
+        </div>
+        <div id="info"></div>
+        <div>
+            <form id="form">
+                <div class="border my-2 p-2">
+                    <div>Include</div>
+                    <div class="form-check">
+                        <input type="radio" id="this_url" class="form-check-input" name="r_type" />
+                        <label class="form-check-label" for="this_url">This URL</label>
+                    </div>
+                    <div class="form-check">
+                        <input type="radio" id="this_domain" class="form-check-input" name="r_type" />
+                        <label class="form-check-label" for="this_domain">This Domain</label>
+                    </div>
+                </div>
+                <div class="border my-2 p-2">
+                    <div>Reload Interval</div>
+                    <div class="input-group">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text">Every</span>
+                        </div>
+                        <input type="number" id="r_interval" class="form-control" min="1" />
+                        <div class="input-group-append">
+                            <span class="input-group-text">Second</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="border my-2 p-2">
+                    <div>Other Options</div>
+                    <div class="form-check">
+                        <input type="checkbox" id="bypass_cache" class="form-check-input" />
+                        <label class="form-check-label" for="bypass_cache">Bypass Cache</label>
+                    </div>
+                </div>
+                <div>
+                    <input type="submit" value="Start" />
+                    <input type="button" id="stop" value="Stop" />
+                    <input type="button" id="close" value="Close" />
+                    <input type="button" id="load_default" value="Load Default" />
+                </div>
+            </form>
+        </div>
+    </div>
+</body>
+
+</html>
