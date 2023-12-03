@@ -91,7 +91,8 @@ function toggleTabConfig(enabled: boolean): UnaryFunction<Observable<unknown>, O
 
             return concat(
                 model.save(),
-                renderContentSrc((model.rType === 0) ? model.url.href : `*://${model.url.host}/*`)
+                // url with # cannot be queried, use host instead
+                renderContentSrc((model.rType === 1 || model.url.href.includes("#")) ? `*://${model.url.host}/*` : model.url.href)
             );
         })
     );
