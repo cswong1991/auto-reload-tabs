@@ -38,7 +38,10 @@ chrome.runtime.onMessage.addListener(function (request, sender) {
                     tab_id,
                     { bypassCache: payload.tab_config.bypassCache }
                 ))),
-                defer(() => from(chrome.action.setBadgeText({ tabId: tab_id, text: (seconds_left < 10) ? seconds_left.toString() : '' })))
+                defer(() => forkJoin([
+                    from(chrome.action.setBadgeText({ tabId: tab_id, text: (seconds_left < 10) ? seconds_left.toString() : '' })),
+                    from(chrome.action.setTitle({ tabId: tab_id, title: `This tab will be reloaded after ${seconds_left.toString()}s` }))
+                ]))
             ).subscribe();
         }
     }
